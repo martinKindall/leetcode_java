@@ -28,10 +28,11 @@ public class P622_circular_queue {
             return true;
         }
 
+        // this is wrong, this takes elements from the front, not from the rear, the example was not 100% descriptive
         public boolean deQueue() {
             if (items == 0) return false;
 
-            rear = (rear + 1) % maxSize;
+            front = Math.floorMod(front - 1, maxSize);
 
             items--;
 
