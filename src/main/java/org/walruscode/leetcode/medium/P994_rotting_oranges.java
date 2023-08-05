@@ -5,6 +5,110 @@ import java.util.Queue;
 
 public class P994_rotting_oranges {
 
+    class SolutionBFSv2 {
+
+        private static final int[][] DIRS = { { 0, 1 }, { 1, 0 }, { -1, 0 }, { 0, -1 } };
+
+        public int orangesRotting(int[][] grid) {
+
+            if (grid == null) {
+                throw new IllegalArgumentException("Input grid is null");
+            }
+            if (grid.length == 0 || grid[0].length == 0) {
+                return 0;
+            }
+
+            Queue<Integer> queue = new LinkedList<>();
+
+            int m = grid.length;
+            int n = grid[0].length;
+
+            int freshOranges = 0;
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (grid[i][j] == 2) {
+                        queue.add(i*n + j);
+                    } else if (grid[i][j] == 1) {
+                        freshOranges++;
+                    }
+                }
+            }
+
+            int minutes = 0;
+
+            while (freshOranges != 0 && !queue.isEmpty()) {
+                int size = queue.size();
+                minutes++;
+
+                for (int i = 0; i < size && freshOranges != 0; i++) {
+                    int current = queue.remove();
+                    int row = current / n;
+                    int col = current % n;
+
+                    for (int[] dir: DIRS) {
+                        int x = row + dir[0];
+                        int y = col + dir[1];
+
+                        if (x < 0 || y < 0 || x >= m || y >= n || grid[x][y] != 1) continue;
+
+                        grid[x][y] = 0;
+
+                        freshOranges--;
+
+                        if (freshOranges == 0) break;
+
+                        queue.add(x*n + y);
+                    }
+                }
+            }
+
+            return freshOranges != 0 ? -1 : minutes;
+        }
+    }
+
+    class SolutionDFS {
+
+        public int orangesRotting(int[][] grid) {
+
+            int m = grid.length;
+            int n = grid[0].length;
+
+            int minutes = 2;
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (grid[i][j] == 2) rottenNearby(grid, i, j, m, n, minutes);
+                }
+            }
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (grid[i][j] == 1) return -1;
+                    minutes = Math.max(minutes, grid[i][j]);
+                }
+            }
+
+            return minutes - 2;
+        }
+
+        private void rottenNearby(int[][] grid, int i, int j, int m, int n, int minutes) {
+            if (i < 0 || j < 0 || i >= m || j >= n ||
+                    grid[i][j] == 0 ||
+                    (1 < grid[i][j] && grid[i][j] < minutes)) // already rotten
+                return;
+
+            grid[i][j] = minutes;
+
+            minutes++;
+
+            rottenNearby(grid, i+1, j, m, n, minutes);
+            rottenNearby(grid, i, j+1, m, n, minutes);
+            rottenNearby(grid, i-1, j, m, n, minutes);
+            rottenNearby(grid, i, j-1, m, n, minutes);
+        }
+    }
+
     class Solution {
         private boolean onlyFresh;
         private int maxMinutes;
