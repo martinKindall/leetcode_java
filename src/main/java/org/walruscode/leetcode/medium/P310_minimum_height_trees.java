@@ -1,11 +1,57 @@
 package org.walruscode.leetcode.medium;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class P310_minimum_height_trees {
+
+    List<Integer>[] adjList;
+
+    public List<Integer> findMinHeightTreesDfs(int n, int[][] edges) {
+        if (n == 0) return List.of();
+        if (n == 1) return List.of(0);
+
+        adjList = new List[n];
+
+        for (int i = 0; i < n; i++) {
+            adjList[i] = new ArrayList<>();
+        }
+
+        for (int[] edge: edges) {
+            adjList[edge[0]].add(edge[1]);
+            adjList[edge[1]].add(edge[0]);
+        }
+
+        boolean[] seen = new boolean[n];
+
+        List<Integer> longestPath = dfs(0, seen);
+
+        seen = new boolean[n];
+        longestPath = dfs(longestPath.get(0), seen);  // the element at position 0 is the furthest element from the initial node taken in the first DFS
+
+        Set<Integer> elements = new HashSet<>();
+        elements.add(longestPath.get(longestPath.size() / 2));
+        elements.add(longestPath.get((longestPath.size() - 1) / 2));
+
+        return new ArrayList<>(elements);
+    }
+
+    private List<Integer> dfs(int node, boolean[] seen) {
+        if (seen[node]) return new ArrayList<>();
+
+        List<Integer> longestPath = new ArrayList<>();
+        seen[node] = true;
+
+        for (Integer neighbor: adjList[node]) {
+            if (!seen[neighbor]) {
+                List<Integer> path = dfs(neighbor, seen);
+                if (path.size() > longestPath.size()) longestPath = path;
+            }
+        }
+
+        longestPath.add(node);
+
+        return longestPath;
+    }
 
     /**
      * We use Kahn's algorithm to find the center(s) of the graph.
