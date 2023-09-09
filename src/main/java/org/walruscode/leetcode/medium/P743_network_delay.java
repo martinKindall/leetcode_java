@@ -43,6 +43,7 @@ public class P743_network_delay {
             for (List<Integer> neighbor: neighbors) {
                 int totalPathWeight = neighbor.get(1) + current.get(1);
 
+                // relaxation step
                 if (totalPathWeight < accumWeight[neighbor.get(0)]) {
                     accumWeight[neighbor.get(0)] = totalPathWeight;
                     queue.add(List.of(neighbor.get(0), accumWeight[neighbor.get(0)]));
