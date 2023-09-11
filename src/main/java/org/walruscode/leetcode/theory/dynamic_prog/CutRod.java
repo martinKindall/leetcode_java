@@ -8,18 +8,47 @@ public class CutRod {
 
     public static void main(String[] args) {
 
-        System.out.println(new CutRod().cutRod());
+        for (int i = 1; i < prices.length; i++) {
+            System.out.println(new CutRod().cutRotBottomUp(i));
+            // System.out.println(new CutRod().cutRodTopBottom(i));
+        }
     }
 
+    private int cutRotBottomUp(int size) {
+        int[] profit = new int[size+1];
 
-    private int cutRod() {
-        int[] profit = new int[prices.length];
-
-        for (int i = 0; i < profit.length; i++) {
+        for (int i = 0; i < size+1; i++) {
             profit[i] = Integer.MIN_VALUE;
         }
 
-        return cutRodAux(profit, prices.length - 1);
+        profit[0] = 0;
+
+        for (int i = 1; i < size+1; i++) {
+
+            int gain = Integer.MIN_VALUE;
+
+            for (int j = 1; j <= i; j++) {
+
+                // this is the step where we decide where to cut.
+                // j = i means there's no cut, hence profit[0] = 0 and prices[j] is the price of the whole rod
+                gain = Math.max(gain, prices[j] + profit[i - j]);
+            }
+
+            profit[i] = gain;
+        }
+
+        return profit[size];
+    }
+
+
+    private int cutRodTopBottom(int size) {
+        int[] profit = new int[size+1];
+
+        for (int i = 0; i < size+1; i++) {
+            profit[i] = Integer.MIN_VALUE;
+        }
+
+        return cutRodAux(profit, size);
     }
 
     private int cutRodAux(int[] profit, int size) {
