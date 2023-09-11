@@ -1,13 +1,59 @@
 package org.walruscode.leetcode.medium;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class P743_network_delay {
 
+    record Node(int vertex, int time) {}
+
     public int networkDelayTime(int[][] times, int n, int k) {
+        // Dijkstra
+
+        List<Node>[] adjList = new List[n];
+
+        for (int i = 0; i < n; i++) {
+            adjList[i] = new ArrayList<>();
+        }
+
+        for (int[] time: times) {
+            adjList[time[0]-1].add(new Node(time[1]-1, time[2]));
+        }
+
+        int[] accumWeight = new int[n];
+        for (int i = 0; i < accumWeight.length; i++) {
+            accumWeight[i] = Integer.MAX_VALUE;
+        }
+
+        Queue<Integer> queue = new PriorityQueue<>((u, v) -> accumWeight[u] - accumWeight[v]);
+
+        accumWeight[k-1] = 0;
+
+        queue.offer(k-1);
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+
+            for (Node neighbor: adjList[current]) {
+                int time = neighbor.time + accumWeight[current];
+                if (time >= accumWeight[neighbor.vertex]) continue;
+
+                accumWeight[neighbor.vertex] = time;
+                queue.offer(neighbor.vertex);
+            }
+        }
+
+        int res = accumWeight[0];
+
+        for (int time: accumWeight) {
+            if (time == Integer.MAX_VALUE) return -1;
+
+            if (time > res) res = time;
+        }
+
+        return res;
+    }
+
+    public int networkDelayTimeSlower(int[][] times, int n, int k) {
         // BFS, level sets
 
         int[] accumWeight = new int[n+1];
