@@ -14,11 +14,7 @@ public class P347_top_k_frequent {
 
         for (int num: nums) counts.put(num, counts.getOrDefault(num, 0) + 1);
 
-        PriorityQueue<Integer> pQueue = new PriorityQueue<>(k+1, new Comparator<Integer>() {
-            public int compare(Integer n1, Integer n2) {
-                return counts.get(n1) - counts.get(n2);
-            }
-        });
+        PriorityQueue<Integer> pQueue = new PriorityQueue<>(k+1, (n1, n2) -> counts.get(n1) - counts.get(n2));
 
         for (int num: counts.keySet()) {
             pQueue.add(num);
